@@ -1,16 +1,18 @@
 import { createApp } from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.27/vue.esm-browser.min.js';
 
-let productModal = null
+let productModal = {};
+let delProductModal = {};
 
 const app = createApp({
     data() {
         return {
             apiUrl: 'https://vue3-course-api.hexschool.io/v2',
             apiPath: 'zhang-hexschool',
+            products: [],
             tempProduct: {
                 imagesUrl: [],
             },
-            products: [],
+            isNew: false,
         };
     },
     methods: {
@@ -27,8 +29,8 @@ const app = createApp({
                 })
         },
         //取得後台產品列表
-        getData() {
-            const url = `${this.apiUrl}/api/${this.apiPath}/admin/products`;
+        getProducts() {
+            const url = `${this.apiUrl}/api/${this.apiPath}/admin/products/all`;
             axios.get(url)
                 .then((response) => {
                     this.products = response.data.products;
@@ -38,14 +40,57 @@ const app = createApp({
                 })
         },
         
-        openModal() {
-            productModal.show()
+        openModal(status, product) {
+            if (status === 'isNew') {
+                this.tempProduct = { //重製結構
+                    imagesUrl: [],
+                }
+                productModal.show();
+                this.isNew = true; //如果是新的會新增
+            } else if (status === 'edit') {
+                this.tempProduct = { ...product };//外層使用淺拷貝就好--因為物件本身是傳參考，如果直接改product會影響本來的值
+                productModal.show();
+                this.isNew = false; //編輯頁會是舊的
+            } else if (status === 'delete') {
+                delProductModal.show();
+                this.tempProduct = { ...product };//將item品項帶入
+            }
         },
+        updateProduct() {//addProduct->updateProduct讓新增和編輯都能重複使用
+            let url = `${this.apiUrl}/api/${this.apiPath}/admin/product`;
+            let method ='post';
+            if (!this.isNew) { //false
+                url = `${this.apiUrl}/api/${this.apiPath}/admin/product/${this.tempProduct.id}`;
+                method ='put';
+            }
+
+            axios[method](url, { data: this.tempProduct })//[]帶變數
+                .then((response) => {
+                    console.log(response);
+                    this.getProducts();//更新是在伺服器更新，必須重新請求取得產品列表
+                    productModal.hide();//將Model關掉
+                })
+                .catch((err) => {
+                    alert(err.data.message);
+                });
+        },
+        delProduct() {
+            let url = `${this.apiUrl}/api/${this.apiPath}/admin/product/${this.tempProduct.id}`;
+
+            axios.delete(url)
+                .then((response) => {
+                    console.log(response);
+                    this.getProducts();//更新是在伺服器更新，必須重新請求取得產品列表
+                    delProductModal.hide();//將Model關掉
+                })
+                .catch((err) => {
+                    alert(err.data.message);
+                });
+        }
     },
     mounted() {
-        productModal = new bootstrap.Modal(document.getElementById('productModal'), {
-            keyboard: false
-          });
+        productModal = new bootstrap.Modal(document.getElementById('productModal'));
+        delProductModal = new bootstrap.Modal(document.getElementById('delProductModal'));
         
         //取得Token
         const token = document.cookie.replace(/(?:(?:^|.*;\s*)hexToken\s*=\s*([^;]*).*$)|^.*$/, '$1');
@@ -58,4 +103,4 @@ const app = createApp({
         
     }
 })
-app.mount('#app')
+app.mount('#app');

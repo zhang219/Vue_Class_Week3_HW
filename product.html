@@ -13,7 +13,7 @@
     <div id="app">
         <div class="container">
             <div class="text-end mt-4">
-                <button class="btn btn-primary" type="button" @click="openModal">
+                <button class="btn btn-primary" type="button" @click="openModal('isNew')"><!--用字串做判斷-->>
                     建立新的產品
                 </button>
             </div>
@@ -60,10 +60,12 @@
                         </td>
                         <td>
                             <div class="btn-group">
-                                <button type="button" class="btn btn-outline-primary btn-sm">
+                                <button type="button" class="btn btn-outline-primary btn-sm"
+                                @click="openModal('edit, item')"><!--當下點選的品項也會帶入-->
                                     編輯
                                 </button>
-                                <button type="button" class="btn btn-outline-danger btn-sm">
+                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                @click="openModal('delete, item')">
                                     刪除
                                 </button>
                             </div>
@@ -98,12 +100,15 @@
                                     <!-- 判斷陣列的方法-->
                                     <div v-if="Array.isArray(tempProduct.imagesUrl)">
                                         <template v-for="(img, key) in tempProduct.imagesUrl" :key="key + '21345'"><!--避免key重複-->
-                                            <input type="text" class="form-control" id="imgUrl" v-modal="tempProduct.imagesUrl">
-                                            <img :src="tempProduct.imagesUrl" class="img-fluid" alt="">
+                                            <input type="text" class="form-control" v-modal="tempProduct.imagesUrl[key]"><!--欄位對應-->
+                                            <img :src="tempProduct.imagesUrl[key]" class="img-fluid" alt="">
                                         </template>
                                     </div>
-                                    <button type="button" class="btn btn-primary w-100">新增</button>
-                                    <button type="button" class="btn btn-outline-danger w-100">刪除</button>
+                                    <!--判斷陣列是否有第一個內容，若沒有要新增一個;當特定索引位置有內容的時候，可以新增第二個-->
+                                    <button v-if="!tempProduct.imagesUrl.length || tempProduct.imagesUrl[tempProduct.imagesUrl.length-1]"
+                                    type="button" class="btn btn-primary w-100" @click="tempProduct.imagesUrl.push('')">新增</button><!--js新增陣列-->
+                                    <button v-else
+                                    type="button" class="btn btn-outline-danger w-100" @click="tempProduct.imagesUrl.pop()">刪除最後一個</button><!--js刪除陣列-->
                                 </div>
                             </div>
                             <div class="col-sm-8">
@@ -166,7 +171,7 @@
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                             取消
                         </button>
-                        <button type="button" class="btn btn-primary" @click="updateProduct">
+                        <button type="button" class="btn btn-primary" @click="updateProduct"><!--確認新增資料-->>
                             確認
                         </button>
                     </div>
@@ -185,13 +190,13 @@
                     </div>
                     <div class="modal-body">
                         是否刪除
-                        <strong class="text-danger">{{ tempProduct.title }}</strong> 商品(刪除後將無法恢復)。
+                        <strong class="text-danger">{{ tempProduct.title }}</strong> 商品(刪除後將無法恢復)。<!--加入品項名稱-->
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                             取消
                         </button>
-                        <button type="button" class="btn btn-danger" @click="delProduct">
+                        <button type="button" class="btn btn-danger" @click="delProduct"><!--綁定刪除方法-->
                             確認刪除
                         </button>
                     </div>
