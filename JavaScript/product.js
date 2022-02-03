@@ -21,7 +21,7 @@ const app = createApp({
             const url = `${this.apiUrl}/api/user/check`;
             axios.post(url)
                 .then(() => {
-                    this.getData();
+                    this.getProducts();
                 })//驗證成功 -> 執行 getData，渲染出產品列表
                 .catch((error) => {
                     alert(error.data.message);//驗證失敗 -> 取得 message 的字串
