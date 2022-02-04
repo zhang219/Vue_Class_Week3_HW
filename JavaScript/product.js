@@ -40,7 +40,7 @@ const app = createApp({
                 })
         },
         
-        openModal(status, product) {
+        openModal(status, item) {
             if (status === 'isNew') {
                 this.tempProduct = { //重製結構
                     imagesUrl: [],
@@ -48,12 +48,12 @@ const app = createApp({
                 productModal.show();
                 this.isNew = true; //如果是新的會新增
             } else if (status === 'edit') {
-                this.tempProduct = { ...product };//外層使用淺拷貝就好--因為物件本身是傳參考，如果直接改product會影響本來的值
+                this.tempProduct = { ...item };//外層使用淺拷貝就好--因為物件本身是傳參考，如果直接改product會影響本來的值
                 productModal.show();
                 this.isNew = false; //編輯頁會是舊的
             } else if (status === 'delete') {
                 delProductModal.show();
-                this.tempProduct = { ...product };//將item品項帶入
+                this.tempProduct = { ...item };//將item品項帶入
             }
         },
         updateProduct() {//addProduct->updateProduct讓新增和編輯都能重複使用
