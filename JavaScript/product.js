@@ -75,7 +75,7 @@ const app = createApp({
                 });
         },
         delProduct() {
-            let url = `${this.apiUrl}/api/${this.apiPath}/admin/product/${this.tempProduct.id}`;
+            const url = `${this.apiUrl}/api/${this.apiPath}/admin/product/${this.tempProduct.id}`;
 
             axios.delete(url)
                 .then((response) => {
